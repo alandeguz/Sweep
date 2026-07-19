@@ -1,10 +1,9 @@
 /**
  *  Sweep
+ *  Copyright (c) Alan DeGuzman 2026
  *  Copyright (c) John Sundell 2019
  *  Licensed under the MIT license (see LICENSE.md)
  */
-
-import Foundation
 
 /// Type used to define an identifier to scan for within a string.
 /// An identifier can also be defined using a string literal.

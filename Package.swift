@@ -1,7 +1,8 @@
-// swift-tools-version:5.0
+// swift-tools-version:6.2
 
 /**
  *  Sweep
+ *  Copyright (c) Alan DeGuzman 2026  
  *  Copyright (c) John Sundell 2019
  *  Licensed under the MIT license (see LICENSE.md)
  */

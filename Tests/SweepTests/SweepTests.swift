@@ -4,93 +4,93 @@
  *  Licensed under the MIT license (see LICENSE.md)
  */
 
-import XCTest
+import Testing
 import Sweep
 
-final class SweepTests: XCTestCase {
-    func testBasicScanning() {
+struct SweepTests {
+    @Test func `Basic scanning`() {
         let string = "Some text <Scanned> some other text."
         let matches = string.substrings(between: "<", and: ">")
-        XCTAssertEqual(matches, ["Scanned"])
+        #expect(matches == ["Scanned"])
     }
 
-    func testMatchingStartOfString() {
+    @Test func `Matching start of string`() {
         let string = "<Scanned> Some text."
         let matches = string.substrings(between: "<", and: ">")
-        XCTAssertEqual(matches, ["Scanned"])
+        #expect(matches == ["Scanned"])
     }
 
-    func testMatchingStartOfStringWithStartIdentifier() {
+    @Test func `Matching start of string with a start identifier`() {
         let string = "<Scanned> Some text."
         let matches = string.substrings(between: .start, and: ">")
-        XCTAssertEqual(matches, ["<Scanned"])
+        #expect(matches == ["<Scanned"])
     }
 
-    func testMatchingEndOfString() {
+    @Test func `Matching end of string`() {
         let string = "Some text <Scanned>"
         let matches = string.substrings(between: "<", and: ">")
-        XCTAssertEqual(matches, ["Scanned"])
+        #expect(matches == ["Scanned"])
     }
 
-    func testMatchingEndOfStringWithEndTerminator() {
+    @Test func `Matching end of string with an end terminator`() {
         let string = "Some text <Scanned>"
         let matches = string.substrings(between: "<", and: .end)
-        XCTAssertEqual(matches, ["Scanned>"])
+        #expect(matches == ["Scanned>"])
     }
 
-    func testMatchingMultipleSegments() {
+    @Test func `Matching multiple segments`() {
         let string = "Some text <First> some other text <Second>."
         let matches = string.substrings(between: "<", and: ">")
-        XCTAssertEqual(matches, ["First", "Second"])
+        #expect(matches == ["First", "Second"])
     }
 
-    func testMatchingBackToBackSegments() {
+    @Test func `Matching back-to-back segments`() {
         let string = "Some text |First|Second| some other text."
         let matches = string.substrings(between: "|", and: "|")
-        XCTAssertEqual(matches, ["First", "Second"])
+        #expect(matches == ["First", "Second"])
     }
 
-    func testMultipleIdentifiersAndTerminators() {
+    @Test func `Multiple identifiers and terminators`() {
         let string = "Some text <First> some other text -[Second]-"
         let matches = string.substrings(between: ["<", "-["], and: [">", "]-"])
-        XCTAssertEqual(matches, ["First", "Second"])
+        #expect(matches == ["First", "Second"])
     }
 
-    func testIgnoringNestedIdentifier() {
+    @Test func `Ignoring nested identifier`() {
         let string = "Some text <Par<Nested>sed> some other text."
         let matches = string.substrings(between: "<", and: ">")
-        XCTAssertEqual(matches, ["Par<Nested"])
+        #expect(matches == ["Par<Nested"])
     }
 
-    func testMultipleNestedIdentifiers() {
+    @Test func `Multiple nested identifiers`() {
         let string = "Some text <Par{First}<Second>sed> some other text."
         let matches = string.substrings(between: ["<", "{"], and: [">", "}"])
-        XCTAssertEqual(matches, ["Par{First", "Second"])
+        #expect(matches == ["Par{First", "Second"])
     }
 
-    func testIgnoringUnterminatedMatch() {
+    @Test func `Ignoring unterminated match`() {
         let string = "Some text [(Match"
         let matches = string.substrings(between: "[(", and: ")]")
-        XCTAssertEqual(matches, [])
+        #expect(matches == [])
     }
 
-    func testIgnoringEmptyMatch() {
+    @Test func `Ignoring empty match`() {
         let string = "Some text [()]"
         let matches = string.substrings(between: "[(", and: ")]")
-        XCTAssertEqual(matches, [])
+        #expect(matches == [])
     }
 
-    func testHTMLScanning() {
+    @Test func `HTML scanning`() {
         let html = "<p>Hello, <b>this text should be bold</b>, right?</p>"
 
         let tags = html.substrings(between: "<", and: ">")
-        XCTAssertEqual(tags, ["p", "b", "/b", "/p"])
+        #expect(tags == ["p", "b", "/b", "/p"])
 
         let boldText = html.substrings(between: "<b>", and: "</b>")
-        XCTAssertEqual(boldText, ["this text should be bold"])
+        #expect(boldText == ["this text should be bold"])
     }
 
-    func testMarkdownScanning() {
+    @Test func `Markdown scanning`() {
         let markdown = """
         # Title
 
@@ -104,13 +104,13 @@ final class SweepTests: XCTestCase {
         """
 
         let h1s = markdown.substrings(between: [.prefix("# "), "\n# "], and: [.end, "\n"])
-        XCTAssertEqual(h1s, ["Title"])
+        #expect(h1s == ["Title"])
 
         let h2s = markdown.substrings(between: [.prefix("## "), "\n## "], and: [.end, "\n"])
-        XCTAssertEqual(h2s, ["Section 1", "Section 2"])
+        #expect(h2s == ["Section 1", "Section 2"])
     }
 
-    func testMultipleMatchers() {
+    @Test func `Multiple matchers`() {
         let string = "Some text <First> some other text [[Second]]."
         var matches = (a: [Substring](), b: [Substring]())
         var ranges = (a: [ClosedRange<String.Index>](), b: [ClosedRange<String.Index>]())
@@ -126,13 +126,13 @@ final class SweepTests: XCTestCase {
             }
         ])
 
-        XCTAssertEqual(matches.a, ["First"])
-        XCTAssertEqual(ranges.a.map { string[$0] }, ["<First>"])
-        XCTAssertEqual(matches.b, ["Second"])
-        XCTAssertEqual(ranges.b.map { string[$0] }, ["[[Second]]"])
+        #expect(matches.a == ["First"])
+        #expect(ranges.a.map { string[$0] } == ["<First>"])
+        #expect(matches.b == ["Second"])
+        #expect(ranges.b.map { string[$0] } == ["[[Second]]"])
     }
 
-    func testDisallowingMultipleMatches() {
+    @Test func `Disallowing multiple matches`() {
         let string = "Some text <First> some other text <Second>, <Third>."
         var matches = [Substring]()
 
@@ -147,47 +147,18 @@ final class SweepTests: XCTestCase {
             )
         ])
 
-        XCTAssertEqual(matches, ["First"])
+        #expect(matches == ["First"])
     }
 
-    func testScanningForSingleSubstring() {
+    @Test func `Scanning for a single substring`() {
         let string = "Some text <First> some other text <Second>, <Third>."
         let match = string.firstSubstring(between: "<", and: ">")
-        XCTAssertEqual(match, "First")
+        #expect(match == "First")
     }
 
-    func testScanningForSingleSubstringWithMultipleIdentifiers() {
+    @Test func `Scanning for a single substring with multiple identifiers`() {
         let string = "Some text <First> some other text [Second], <Third>."
         let match = string.firstSubstring(between: ["<", "["], and: [">", "]"])
-        XCTAssertEqual(match, "First")
-    }
-
-    func testAllTestsRunOnLinux() {
-        verifyAllTestsRunOnLinux()
-    }
-}
-
-extension SweepTests: LinuxTestable {
-    static var allTests: [(String, (SweepTests) -> () throws -> Void)] {
-        return [
-            ("testBasicScanning", testBasicScanning),
-            ("testMatchingStartOfString", testMatchingStartOfString),
-            ("testMatchingStartOfStringWithStartIdentifier", testMatchingStartOfStringWithStartIdentifier),
-            ("testMatchingEndOfString", testMatchingEndOfString),
-            ("testMatchingEndOfStringWithEndTerminator", testMatchingEndOfStringWithEndTerminator),
-            ("testMatchingMultipleSegments", testMatchingMultipleSegments),
-            ("testMatchingBackToBackSegments", testMatchingBackToBackSegments),
-            ("testMultipleIdentifiersAndTerminators", testMultipleIdentifiersAndTerminators),
-            ("testIgnoringNestedIdentifier", testIgnoringNestedIdentifier),
-            ("testMultipleNestedIdentifiers", testMultipleNestedIdentifiers),
-            ("testIgnoringUnterminatedMatch", testIgnoringUnterminatedMatch),
-            ("testIgnoringEmptyMatch", testIgnoringEmptyMatch),
-            ("testHTMLScanning", testHTMLScanning),
-            ("testMarkdownScanning", testMarkdownScanning),
-            ("testMultipleMatchers", testMultipleMatchers),
-            ("testDisallowingMultipleMatches", testDisallowingMultipleMatches),
-            ("testScanningForSingleSubstring", testScanningForSingleSubstring),
-            ("testScanningForSingleSubstringWithMultipleIdentifiers", testScanningForSingleSubstringWithMultipleIdentifiers)
-        ]
+        #expect(match == "First")
     }
 }
